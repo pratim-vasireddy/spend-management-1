@@ -267,36 +267,38 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                             className="h-7 text-xs"
                           />
                         </TableCell>
-                        <TableCell className="text-center py-1.5 space-x-1">
-                           <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => handleGeocodeSupplier(supplier)}
-                                disabled={geocodingSupplierId === supplier.id || (!supplier.city && !supplier.streetAddress && !supplier.postalCode && !supplier.country)}
-                                aria-label="Fetch Coordinates"
-                              >
-                                {geocodingSupplierId === supplier.id ? (
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                ) : (
-                                  <MapPin className={`h-3.5 w-3.5 ${supplier.latitude && supplier.longitude ? 'text-green-500' : 'text-blue-600 hover:text-blue-700' }`} />
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">
-                              <p>{supplier.latitude && supplier.longitude ? `Coords: ${supplier.latitude.toFixed(2)}, ${supplier.longitude.toFixed(2)}` : 'Fetch Coordinates'}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                             <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" aria-label="Delete Supplier" onClick={() => handleDeleteSupplier(supplier.id)}>
-                                  <Trash2 className="h-3.5 w-3.5" />
+                        <TableCell className="py-1.5">
+                          <div className="flex items-center justify-center space-x-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  onClick={() => handleGeocodeSupplier(supplier)}
+                                  disabled={geocodingSupplierId === supplier.id || (!supplier.city && !supplier.streetAddress && !supplier.postalCode && !supplier.country)}
+                                  aria-label="Fetch Coordinates"
+                                >
+                                  {geocodingSupplierId === supplier.id ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <MapPin className={`h-3.5 w-3.5 ${supplier.latitude && supplier.longitude ? 'text-green-500' : 'text-blue-600 hover:text-blue-700' }`} />
+                                  )}
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent side="top"><p>Delete Supplier</p></TooltipContent>
-                          </Tooltip>
+                              <TooltipContent side="top">
+                                <p>{supplier.latitude && supplier.longitude ? `Coords: ${supplier.latitude.toFixed(2)}, ${supplier.longitude.toFixed(2)}` : 'Fetch Coordinates'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                               <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" aria-label="Delete Supplier" onClick={() => handleDeleteSupplier(supplier.id)}>
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top"><p>Delete Supplier</p></TooltipContent>
+                            </Tooltip>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
