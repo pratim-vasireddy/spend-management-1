@@ -292,7 +292,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                             </Tooltip>
                             <Tooltip>
                                <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" aria-label="Delete Supplier" onClick={() => handleDeleteSupplier(supplier.id)}>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-red-400 hover:bg-red-500/10" aria-label="Delete Supplier" onClick={() => handleDeleteSupplier(supplier.id)}>
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
                                 </TooltipTrigger>
