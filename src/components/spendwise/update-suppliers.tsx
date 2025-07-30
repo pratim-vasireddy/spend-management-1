@@ -274,7 +274,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7"
+                                  className="h-7 w-7 group hover:bg-green-500/10"
                                   onClick={() => handleGeocodeSupplier(supplier)}
                                   disabled={geocodingSupplierId === supplier.id || (!supplier.city && !supplier.streetAddress && !supplier.postalCode && !supplier.country)}
                                   aria-label="Fetch Coordinates"
@@ -282,7 +282,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                                   {geocodingSupplierId === supplier.id ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                   ) : (
-                                    <MapPin className={`h-3.5 w-3.5 ${supplier.latitude && supplier.longitude ? 'text-green-500' : 'text-blue-600 hover:text-blue-700' }`} />
+                                    <MapPin className={'h-3.5 w-3.5 text-slate-400 group-hover:text-green-400'} />
                                   )}
                                 </Button>
                               </TooltipTrigger>
