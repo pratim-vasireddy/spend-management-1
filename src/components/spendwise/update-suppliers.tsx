@@ -181,15 +181,18 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
             <div className="flex justify-between items-center mb-1.5">
                <h3 className="text-base font-semibold text-muted-foreground">Supplier Details</h3>
               <div className="flex items-center gap-2 ml-auto">
-                <Button onClick={onAddSupplier} size="sm" className="text-xs">
+              <Button 
+                  onClick={onAddSupplier} 
+                  size="sm" 
+                  className="text-xs text-slate-50 bg-slate-950 border border-slate-800 hover:bg-slate-800 hover:text-slate-50"
+                >
                   <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Supplier
                 </Button>
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploadingExcel}
-                  className="text-xs"
+                  className="text-xs text-slate-50 bg-slate-950 border border-slate-800 hover:bg-slate-800 hover:text-slate-50"
                 >
                   {isUploadingExcel ? (
                     <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
