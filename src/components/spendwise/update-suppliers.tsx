@@ -20,7 +20,7 @@ interface UpdateSuppliersTabProps {
 
 const addSupplierFieldGroups: FieldGroup[] = [
     [
-        { id: 'supplierId', label: 'Supplier ID', type: 'text', placeholder: 'e.g., SUP-001', required: true },
+        { id: 'supplierId', label: 'Supplier ID', type: 'text', placeholder: 'e.g., 989000', required: true },
         { id: 'name', label: 'Name', type: 'text', placeholder: 'e.g., ABC Manufacturing', required: true },
     ],
     [
@@ -39,18 +39,18 @@ const SupplierPreview = (data: Partial<Supplier>) => (
               <Building className="h-4 w-4 mr-2" />
               Supplier Preview
           </h3>
-          <div className="grid grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-3 gap-4 text-center">
             <div className="bg-slate-900 p-3 rounded-md">
               <p className="text-xs text-slate-400">Supplier ID</p>
-              <p className="font-bold text-sm truncate">{data.supplierId || 'SUP-XXX'}</p>
+              <p className="font-bold text-sm truncate">{data.supplierId || '######'}</p>
             </div>
             <div className="bg-slate-900 p-3 rounded-md">
-              <p className="text-xs text-slate-400">Supplier Name</p>
-              <p className="font-bold text-sm text-green-400 truncate">{data.name || 'Company Name'}</p>
+              <p className="text-xs text-slate-400">Name</p>
+              <p className="font-bold text-sm text-green-400 truncate">{data.name || 'Supplier Name'}</p>
             </div>
             <div className="bg-slate-900 p-3 rounded-md">
               <p className="text-xs text-slate-400">Location</p>
-              <p className="font-bold text-sm text-orange-400 truncate">{data.country || 'Country'}</p>
+              <p className="font-bold text-sm text-orange-400 truncate">{data.city || 'City'}, {data.country || 'Country'}</p>
             </div>
           </div>
        </div>
