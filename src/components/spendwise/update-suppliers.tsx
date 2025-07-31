@@ -2,7 +2,7 @@ import type { Supplier } from '@/types/spendwise';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Building, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database, Edit } from "lucide-react";
+import { ChevronDown, Building, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database, Edit } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import SupplierWorldMap from './supplier-world-map';
@@ -240,7 +240,9 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="sm" className="text-xs text-slate-50 bg-slate-950 border border-slate-800 hover:bg-slate-800 hover:text-slate-50">
-                      <Database className="mr-1.5 h-3.5 w-3.5" /> Data
+                      <Database className="mr-1.5 h-3.5 w-3.5" /> 
+                      Data
+                      <ChevronDown className="ml-1.5 h-3.5 w-3.5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
