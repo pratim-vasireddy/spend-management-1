@@ -237,36 +237,17 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                       className="hover:bg-slate-700/50 transition-colors duration-150 ease-in-out bg-slate-800">
                         <TableCell className="font-mono text-xs py-1.5">{supplier.supplierId}</TableCell>
                         <TableCell className="py-1.5">
-                          <Input
-                            type="text"
-                            value={supplier.name}
-                            onChange={(e) => handleSupplierInputChange(supplier.id, 'name', e.target.value)}
-                            className="h-7 text-xs"
-                          />
+                          {supplier.name}
                         </TableCell>
                         <TableCell className="py-1.5">
-                          <Input
-                            type="text"
-                            value={supplier.description}
-                            onChange={(e) => handleSupplierInputChange(supplier.id, 'description', e.target.value)}
-                            className="h-7 text-xs"
-                          />
+                          {supplier.description}
+                          
                         </TableCell>
                         <TableCell className="py-1.5">
-                          <Input
-                            type="text"
-                            value={supplier.city}
-                            onChange={(e) => handleSupplierInputChange(supplier.id, 'city', e.target.value)}
-                            className="h-7 text-xs"
-                          />
+                          {supplier.city}
                         </TableCell>
                         <TableCell className="py-1.5">
-                          <Input
-                            type="text"
-                            value={supplier.country}
-                            onChange={(e) => handleSupplierInputChange(supplier.id, 'country', e.target.value)}
-                            className="h-7 text-xs"
-                          />
+                          {supplier.country}
                         </TableCell>
                         <TableCell className="py-1.5">
                           <div className="flex items-center justify-center space-x-1">
