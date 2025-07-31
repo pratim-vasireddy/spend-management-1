@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Building, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet } from "lucide-react";
+import { Building, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import SupplierWorldMap from './supplier-world-map';
@@ -11,6 +11,7 @@ import { geocodeSupplierAddress } from '@/lib/geocodingService';
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useRef } from 'react';
 import { parseSuppliersExcel } from './excel-parser';
+import { DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 
 interface UpdateSuppliersTabProps {
   suppliers: Supplier[];
@@ -180,27 +181,28 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
           <section>
             <div className="flex justify-between items-center mb-1.5">
                <h3 className="text-base font-semibold text-muted-foreground">Supplier Details</h3>
-              <div className="flex items-center gap-2 ml-auto">
-              <Button 
-                  onClick={onAddSupplier} 
-                  size="sm" 
-                  className="text-xs text-slate-50 bg-slate-950 border border-slate-800 hover:bg-slate-800 hover:text-slate-50"
-                >
-                  <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Supplier
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploadingExcel}
-                  className="text-xs text-slate-50 bg-slate-950 border border-slate-800 hover:bg-slate-800 hover:text-slate-50"
-                >
-                  {isUploadingExcel ? (
-                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                  ) : (
-                    <FileSpreadsheet className="h-3.5 w-3.5 mr-1.5" />
-                  )}
-                  {isUploadingExcel ? "Uploading..." : "Upload"}
-                </Button>
+               <div className="flex items-center gap-2 ml-auto"> 
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" className="text-xs text-slate-50 bg-slate-950 border border-slate-800 hover:bg-slate-800 hover:text-slate-50">
+                      <Database className="mr-1.5 h-3.5 w-3.5" /> Data
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={onAddSupplier}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      <span>Add Supplier</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => fileInputRef.current?.click()} disabled={isUploadingExcel}>
+                      {isUploadingExcel ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <FileSpreadsheet className="h-4 w-4 mr-2" />
+                      )}
+                      <span>{isUploadingExcel ? "Uploading..." : "Upload Excel"}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <input
                   ref={fileInputRef}
                   type="file"
