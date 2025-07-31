@@ -11,12 +11,26 @@ import { useToast } from "@/hooks/use-toast";
 import React, { useState, useRef } from 'react';
 import { parseSuppliersExcel } from './excel-parser';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import AddSupplierDialog from './add-supplier-dialog';
+import AddSupplierDialog, { FieldGroup } from './add-supplier-dialog';
 
 interface UpdateSuppliersTabProps {
   suppliers: Supplier[];
   setSuppliers: React.Dispatch<React.SetStateAction<Supplier[]>>;
 }
+
+const addSupplierFieldGroups: FieldGroup[] = [
+    [
+        { id: 'supplierId', label: 'Supplier ID', type: 'text', placeholder: 'e.g., SUP-001', required: true },
+        { id: 'name', label: 'Name', type: 'text', placeholder: 'e.g., ABC Manufacturing', required: true },
+    ],
+    [
+        { id: 'description', label: 'Description', type: 'textarea', placeholder: 'Brief description of the supplier' },
+    ],
+    [
+        { id: 'city', label: 'City', type: 'text', placeholder: 'e.g., Tokyo' },
+        { id: 'country', label: 'Country', type: 'text', placeholder: 'e.g., Japan' },
+    ]
+];
 
 export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSuppliersTabProps) {
   const { toast } = useToast();
@@ -263,6 +277,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
           isOpen={isAddSupplierDialogOpen}
           onClose={() => setIsAddSupplierDialogOpen(false)}
           onAddSupplier={handleAddNewSupplier}
+          fieldGroups={addSupplierFieldGroups}
         />
       </CardContent>
     </Card>

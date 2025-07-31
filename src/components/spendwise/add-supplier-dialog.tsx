@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,20 +14,37 @@ import type { Supplier } from '@/types/spendwise';
 import { Building, PlusCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
+export interface FormField {
+  id: keyof Supplier;
+  label: string;
+  type: 'text' | 'textarea';
+  placeholder?: string;
+  required?: boolean;
+}
+
+export type FieldGroup = FormField[];
+
 interface AddSupplierDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddSupplier: (newSupplier: Supplier) => void;
+  onAddSupplier: (newSupplier: Partial<Supplier>) => void;
+  fieldGroups: FieldGroup[];
 }
 
-export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier }: AddSupplierDialogProps) {
-  const [formData, setFormData] = useState({
-    supplierId: '',
-    name: '',
-    description: '',
-    city: '',
-    country: '',
-  });
+export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fieldGroups }: AddSupplierDialogProps) {
+  const [formData, setFormData] = useState<Partial<Supplier>>({});
+
+  useEffect(() => {
+    if (isOpen) {
+      const initialFormData = fieldGroups
+        .flat()
+        .reduce((acc, field) => {
+          acc[field.id] = '';
+          return acc;
+        }, {} as Partial<Supplier>);
+      setFormData(initialFormData);
+    }
+  }, [isOpen, fieldGroups]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -35,22 +52,50 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier }: Ad
   };
 
   const handleAddSupplier = () => {
-    const newSupplier: Supplier = {
+    const newSupplier: Partial<Supplier> = {
       id: uuidv4(),
       ...formData,
       address: [formData.city, formData.country].filter(Boolean).join(', '),
       latitude: null,
       longitude: null,
     };
-    onAddSupplier(newSupplier);
+    onAddSupplier(newSupplier as Supplier);
     onClose();
-    setFormData({
-      supplierId: '',
-      name: '',
-      description: '',
-      city: '',
-      country: '',
-    });
+  };
+
+  const renderField = (field: FormField) => {
+    const { id, label, type, placeholder, required } = field;
+    const labelText = `${label}${required ? ' *' : ''}`;
+
+    if (type === 'textarea') {
+      return (
+        <div key={id} className="space-y-2">
+          <Label htmlFor={id} className="text-slate-400">{labelText}</Label>
+          <textarea
+            id={id}
+            value={formData[id] as string || ''}
+            onChange={handleInputChange}
+            className="w-full bg-slate-800 border-slate-600 rounded-md p-2 focus:ring-blue-500"
+            placeholder={placeholder}
+            rows={3}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div key={id} className="space-y-2">
+        <Label htmlFor={id} className="text-slate-400">{labelText}</Label>
+        <Input
+          id={id}
+          type={type}
+          value={formData[id] as string || ''}
+          onChange={handleInputChange}
+          className="bg-slate-800 border-slate-600 focus:ring-blue-500"
+          placeholder={placeholder}
+        />
+      </div>
+    );
   };
 
   return (
@@ -98,40 +143,11 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier }: Ad
         </div>
 
         <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-                 <div className="space-y-2">
-                    <Label htmlFor="supplierId" className="text-slate-400">Supplier ID *</Label>
-                    <Input
-                        id="supplierId"
-                        value={formData.supplierId}
-                        onChange={handleInputChange}
-                        className="bg-slate-800 border-slate-600 focus:ring-blue-500"
-                        placeholder="e.g., SUP-001"
-                    />
-                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="name" className="text-slate-400">Name *</Label>
-                    <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="bg-slate-800 border-slate-600 focus:ring-blue-500"
-                        placeholder="e.g., ABC Manufacturing"
-                    />
-                 </div>
+          {fieldGroups.map((group, groupIndex) => (
+            <div key={groupIndex} className={`grid grid-cols-1 md:grid-cols-${group.length} gap-6`}>
+              {group.map(renderField)}
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="description" className="text-slate-400">Description</Label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full bg-slate-800 border-slate-600 rounded-md p-2 focus:ring-blue-500"
-                  placeholder="Brief description of the supplier"
-                  rows={3}
-                />
-            </div>
-            {/* Address information can be added here if needed */}
+          ))}
         </div>
 
         <DialogFooter className="mt-6">
