@@ -233,7 +233,8 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                   </TableHeader>
                   <TableBody>
                     {suppliers.map((supplier, idx) => (
-                      <TableRow key={supplier.id}>
+                      <TableRow key={supplier.id}
+                      className="hover:bg-slate-700/50 transition-colors duration-150 ease-in-out bg-slate-800">
                         <TableCell className="font-mono text-xs py-1.5">{supplier.supplierId}</TableCell>
                         <TableCell className="py-1.5">
                           <Input
