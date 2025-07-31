@@ -2,8 +2,7 @@ import type { Supplier } from '@/types/spendwise';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Building, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database } from "lucide-react";
+import { Fingerprint, Building, FileText, Globe2, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import SupplierWorldMap from './supplier-world-map';
@@ -11,57 +10,32 @@ import { geocodeSupplierAddress } from '@/lib/geocodingService';
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useRef } from 'react';
 import { parseSuppliersExcel } from './excel-parser';
-import { DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import AddSupplierDialog from './add-supplier-dialog';
 
 interface UpdateSuppliersTabProps {
   suppliers: Supplier[];
   setSuppliers: React.Dispatch<React.SetStateAction<Supplier[]>>;
-  onAddSupplier: () => void;
 }
 
-export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSupplier }: UpdateSuppliersTabProps) {
+export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSuppliersTabProps) {
   const { toast } = useToast();
   const [geocodingSupplierId, setGeocodingSupplierId] = useState<string | null>(null);
   const [isUploadingExcel, setIsUploadingExcel] = useState(false);
+  const [isAddSupplierDialogOpen, setIsAddSupplierDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleSupplierInputChange = (supplierId: string, field: keyof Supplier, value: string | number) => {
-    setSuppliers(prevSuppliers =>
-      prevSuppliers.map(s => {
-        if (s.id === supplierId) {
-          const updatedSupplier = { ...s, [field]: value };
-
-          if (['city', 'postalCode', 'country', 'streetAddress', 'stateOrProvince'].includes(field as string)) {
-            const street = updatedSupplier.streetAddress || '';
-            const cityVal = updatedSupplier.city || '';
-            const state = updatedSupplier.stateOrProvince || '';
-            const postal = updatedSupplier.postalCode || '';
-            const countryVal = updatedSupplier.country || '';
-
-            let fullAddress = [street, cityVal, state, postal, countryVal]
-              .filter(Boolean)
-              .join(', ');
-
-            if (state && postal) {
-                fullAddress = fullAddress.replace(`${cityVal}, ${state}, ${postal}`, `${cityVal}, ${state} ${postal}`);
-            }
-            updatedSupplier.address = fullAddress.replace(/ , |, $/g, '').replace(/, ,/g, ',').replace(/  +/g, ' ').trim();
-          }
-          return updatedSupplier;
-        }
-        return s;
-      })
-    );
-  };
 
   const handleDeleteSupplier = (supplierId: string) => {
     setSuppliers(prevSuppliers => prevSuppliers.filter(s => s.id !== supplierId));
   };
 
+  const handleAddNewSupplier = (newSupplier: Supplier) => {
+    setSuppliers(prev => [newSupplier, ...prev]);
+  };
+
   const handleGeocodeSupplier = async (supplierToGeocode: Supplier) => {
       if (!supplierToGeocode) return;
 
-      // Check if we have enough address info to geocode
       const hasAddressInfo = supplierToGeocode.city || supplierToGeocode.streetAddress || supplierToGeocode.postalCode || supplierToGeocode.country;
       if (!hasAddressInfo) {
         toast({
@@ -189,7 +163,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={onAddSupplier}>
+                    <DropdownMenuItem onClick={() => setIsAddSupplierDialogOpen(true)}>
                       <PlusCircle className="mr-2 h-4 w-4" />
                       <span>Add Supplier</span>
                     </DropdownMenuItem>
@@ -223,34 +197,24 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
             ) : (
               <ScrollArea className="h-[calc(100vh-300px)] overflow-auto rounded-md border">
                 <Table className="relative">
-                  <TableHeader className="sticky top-0 z-10">
-                    <TableRow className="border-b border-slate-700 bg-slate-900 hover:bg-slate-900">
-                      <TableHead className="w-[80px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">ID</TableHead>
-                      <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Name</TableHead>
-                      <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Description</TableHead>
+                  <TableHeader className="sticky top-0 z-10 bg-background">
+                    <TableRow>
+                      <TableHead className="w-[80px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Fingerprint className="inline-block mr-1 h-3.5 w-3.5" />ID</TableHead>
+                      <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Building className="inline-block mr-1 h-3.5 w-3.5" />Name</TableHead>
+                      <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><FileText className="inline-block mr-1 h-3.5 w-3.5" />Description</TableHead>
                       <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">City</TableHead>
-                      <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Country</TableHead>
+                      <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Globe2 className="inline-block mr-1 h-3.5 w-3.5" />Country</TableHead>
                       <TableHead className="text-center w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {suppliers.map((supplier, idx) => (
-                      <TableRow key={supplier.id}
-                      className="hover:bg-slate-700/50 transition-colors duration-150 ease-in-out bg-slate-800">
+                    {suppliers.map((supplier) => (
+                      <TableRow key={supplier.id}>
                         <TableCell className="font-mono text-xs py-1.5">{supplier.supplierId}</TableCell>
-                        <TableCell className="py-1.5">
-                          {supplier.name}
-                        </TableCell>
-                        <TableCell className="py-1.5">
-                          {supplier.description}
-                          
-                        </TableCell>
-                        <TableCell className="py-1.5">
-                          {supplier.city}
-                        </TableCell>
-                        <TableCell className="py-1.5">
-                          {supplier.country}
-                        </TableCell>
+                        <TableCell className="py-1.5">{supplier.name}</TableCell>
+                        <TableCell className="py-1.5">{supplier.description}</TableCell>
+                        <TableCell className="py-1.5">{supplier.city}</TableCell>
+                        <TableCell className="py-1.5">{supplier.country}</TableCell>
                         <TableCell className="py-1.5">
                           <div className="flex items-center justify-center space-x-1">
                             <Tooltip>
@@ -295,6 +259,11 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
         <div className="md:col-span-3 space-y-4">
           <SupplierWorldMap suppliers={suppliers} />
         </div>
+        <AddSupplierDialog
+          isOpen={isAddSupplierDialogOpen}
+          onClose={() => setIsAddSupplierDialogOpen(false)}
+          onAddSupplier={handleAddNewSupplier}
+        />
       </CardContent>
     </Card>
   );
