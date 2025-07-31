@@ -219,16 +219,16 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
             {suppliers.length === 0 ? (
               <p className="text-muted-foreground text-center py-3">No suppliers available. Generate, add, or upload some suppliers.</p>
             ) : (
-              <ScrollArea className="h-[calc(100vh-300px)] overflow-x-auto">
-                <Table>
-                  <TableHeader>
+              <ScrollArea className="h-[calc(100vh-300px)] overflow-auto rounded-md border">
+                <Table className="relative">
+                  <TableHeader className="sticky top-0 z-10 bg-background">
                     <TableRow>
-                      <TableHead className="w-[80px] text-xs"><Fingerprint className="inline-block mr-1 h-3.5 w-3.5" />ID</TableHead>
-                      <TableHead className="min-w-[130px] text-xs"><Building className="inline-block mr-1 h-3.5 w-3.5" />Name</TableHead>
-                      <TableHead className="min-w-[130px] text-xs"><FileText className="inline-block mr-1 h-3.5 w-3.5" />Description</TableHead>
-                      <TableHead className="min-w-[90px] text-xs">City</TableHead>
-                      <TableHead className="min-w-[90px] text-xs"><Globe2 className="inline-block mr-1 h-3.5 w-3.5" />Country</TableHead>
-                      <TableHead className="text-center w-[90px] text-xs">Actions</TableHead>
+                      <TableHead className="w-[80px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Fingerprint className="inline-block mr-1 h-3.5 w-3.5" />ID</TableHead>
+                      <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Building className="inline-block mr-1 h-3.5 w-3.5" />Name</TableHead>
+                      <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><FileText className="inline-block mr-1 h-3.5 w-3.5" />Description</TableHead>
+                      <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">City</TableHead>
+                      <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Globe2 className="inline-block mr-1 h-3.5 w-3.5" />Country</TableHead>
+                      <TableHead className="text-center w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
