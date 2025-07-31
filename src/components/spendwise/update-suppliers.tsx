@@ -46,7 +46,7 @@ const SupplierPreview = (data: Partial<Supplier>) => (
               <p className="font-bold text-sm truncate">{data.supplierId || '######'}</p>
             </div>
             <div className="bg-slate-900 p-3 rounded-md">
-              <p className="text-xs text-slate-400">Name</p>
+              <p className="text-xs text-slate-400">Supplier Name</p>
               <p className="font-bold text-sm text-green-400 truncate">{data.name || 'Supplier Name'}</p>
             </div>
             <div className="bg-slate-900 p-3 rounded-md">
