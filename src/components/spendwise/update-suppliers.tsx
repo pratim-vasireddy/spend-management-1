@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import React, { useState, useRef } from 'react';
 import { parseSuppliersExcel } from './excel-parser';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import AddSupplierDialog, { FieldGroup } from './add-supplier-dialog';
+import DataEntryDialog, { FieldGroup } from './data-entry-dialog';
 
 interface UpdateSuppliersTabProps {
   suppliers: Supplier[];
@@ -32,18 +32,51 @@ const addSupplierFieldGroups: FieldGroup[] = [
     ]
 ];
 
+const SupplierPreview = (data: Partial<Supplier>) => (
+    <div className="p-1 my-4 bg-slate-800 border border-slate-700 rounded-lg">
+       <div className="p-4">
+          <h3 className="text-base font-semibold text-slate-300 mb-4 flex items-center">
+              <Building className="h-4 w-4 mr-2" />
+              Supplier Preview
+          </h3>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div className="bg-slate-900 p-3 rounded-md">
+              <p className="text-xs text-slate-400">Supplier ID</p>
+              <p className="font-bold text-sm truncate">{data.supplierId || 'SUP-XXX'}</p>
+            </div>
+            <div className="bg-slate-900 p-3 rounded-md">
+              <p className="text-xs text-slate-400">Supplier Name</p>
+              <p className="font-bold text-sm text-green-400 truncate">{data.name || 'Company Name'}</p>
+            </div>
+            <div className="bg-slate-900 p-3 rounded-md">
+              <p className="text-xs text-slate-400">Location</p>
+              <p className="font-bold text-sm text-orange-400 truncate">{data.country || 'Country'}</p>
+            </div>
+          </div>
+       </div>
+    </div>
+);
+
+
 export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSuppliersTabProps) {
   const { toast } = useToast();
   const [geocodingSupplierId, setGeocodingSupplierId] = useState<string | null>(null);
   const [isUploadingExcel, setIsUploadingExcel] = useState(false);
-  const [isAddSupplierDialogOpen, setIsAddSupplierDialogOpen] = useState(false);
+  const [isDataEntryDialogOpen, setIsDataEntryDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDeleteSupplier = (supplierId: string) => {
     setSuppliers(prevSuppliers => prevSuppliers.filter(s => s.id !== supplierId));
   };
 
-  const handleAddNewSupplier = (newSupplier: Supplier) => {
+  const handleAddNewSupplier = (newSupplierData: Omit<Supplier, 'id' | 'address' | 'latitude' | 'longitude'>) => {
+    const newSupplier: Supplier = {
+      ...newSupplierData,
+      id: '', // This will be replaced by uuid in DataEntryDialog, but required by type
+      address: [newSupplierData.city, newSupplierData.country].filter(Boolean).join(', '),
+      latitude: null,
+      longitude: null,
+    };
     setSuppliers(prev => [newSupplier, ...prev]);
   };
 
@@ -177,7 +210,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setIsAddSupplierDialogOpen(true)}>
+                    <DropdownMenuItem onClick={() => setIsDataEntryDialogOpen(true)}>
                       <PlusCircle className="mr-2 h-4 w-4" />
                       <span>Add Supplier</span>
                     </DropdownMenuItem>
@@ -273,11 +306,14 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
         <div className="md:col-span-3 space-y-4">
           <SupplierWorldMap suppliers={suppliers} />
         </div>
-        <AddSupplierDialog
-          isOpen={isAddSupplierDialogOpen}
-          onClose={() => setIsAddSupplierDialogOpen(false)}
-          onAddSupplier={handleAddNewSupplier}
+        <DataEntryDialog
+          isOpen={isDataEntryDialogOpen}
+          onClose={() => setIsDataEntryDialogOpen(false)}
+          onSubmit={handleAddNewSupplier}
           fieldGroups={addSupplierFieldGroups}
+          title="Add New Supplier"
+          description="Enter the details for the new supplier."
+          preview={SupplierPreview}
         />
       </CardContent>
     </Card>

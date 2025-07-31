@@ -10,12 +10,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { Supplier } from '@/types/spendwise';
-import { Building, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface FormField {
-  id: keyof Supplier;
+  id: string;
   label: string;
   type: 'text' | 'textarea';
   placeholder?: string;
@@ -24,15 +23,26 @@ export interface FormField {
 
 export type FieldGroup = FormField[];
 
-interface AddSupplierDialogProps {
+interface DataEntryDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddSupplier: (newSupplier: Partial<Supplier>) => void;
+  onSubmit: (data: any) => void;
   fieldGroups: FieldGroup[];
+  title: string;
+  description: string;
+  preview?: (data: any) => React.ReactNode;
 }
 
-export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fieldGroups }: AddSupplierDialogProps) {
-  const [formData, setFormData] = useState<Partial<Supplier>>({});
+export default function DataEntryDialog({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  fieldGroups,
+  title,
+  description,
+  preview
+}: DataEntryDialogProps) {
+  const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -41,7 +51,7 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fiel
         .reduce((acc, field) => {
           acc[field.id] = '';
           return acc;
-        }, {} as Partial<Supplier>);
+        }, {} as any);
       setFormData(initialFormData);
     }
   }, [isOpen, fieldGroups]);
@@ -51,15 +61,9 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fiel
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleAddSupplier = () => {
-    const newSupplier: Partial<Supplier> = {
-      id: uuidv4(),
-      ...formData,
-      address: [formData.city, formData.country].filter(Boolean).join(', '),
-      latitude: null,
-      longitude: null,
-    };
-    onAddSupplier(newSupplier as Supplier);
+  const handleSubmit = () => {
+    const dataWithId = { id: uuidv4(), ...formData };
+    onSubmit(dataWithId);
     onClose();
   };
 
@@ -73,7 +77,7 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fiel
           <Label htmlFor={id} className="text-slate-400">{labelText}</Label>
           <textarea
             id={id}
-            value={formData[id] as string || ''}
+            value={formData[id] || ''}
             onChange={handleInputChange}
             className="w-full bg-slate-800 border-slate-600 rounded-md p-2 focus:ring-blue-500"
             placeholder={placeholder}
@@ -89,7 +93,7 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fiel
         <Input
           id={id}
           type={type}
-          value={formData[id] as string || ''}
+          value={formData[id] || ''}
           onChange={handleInputChange}
           className="bg-slate-800 border-slate-600 focus:ring-blue-500"
           placeholder={placeholder}
@@ -107,40 +111,15 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fiel
               <PlusCircle className="h-6 w-6 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold">Add New Supplier</DialogTitle>
+              <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
               <DialogDescription className="text-slate-400">
-                Enter the details for the new supplier.
+                {description}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
         
-        <div className="p-1 my-4 bg-slate-800 border border-slate-700 rounded-lg">
-           <div className="p-4">
-              <h3 className="text-base font-semibold text-slate-300 mb-4 flex items-center">
-                  <Building className="h-4 w-4 mr-2" />
-                  Supplier Preview
-              </h3>
-              <div className="grid grid-cols-4 gap-4 text-center">
-                <div className="bg-slate-900 p-3 rounded-md">
-                  <p className="text-xs text-slate-400">Supplier ID</p>
-                  <p className="font-bold text-sm truncate">{formData.supplierId || 'SUP-XXX'}</p>
-                </div>
-                <div className="bg-slate-900 p-3 rounded-md">
-                  <p className="text-xs text-slate-400">Company Name</p>
-                  <p className="font-bold text-sm text-green-400 truncate">{formData.name || 'Company Name'}</p>
-                </div>
-                <div className="bg-slate-900 p-3 rounded-md">
-                  <p className="text-xs text-slate-400">Location</p>
-                  <p className="font-bold text-sm text-orange-400 truncate">{formData.country || 'Country'}</p>
-                </div>
-                <div className="bg-slate-900 p-3 rounded-md">
-                  <p className="text-xs text-slate-400">Performance</p>
-                  <p className="font-bold text-sm text-yellow-400">5/5 ★</p>
-                </div>
-              </div>
-           </div>
-        </div>
+        {preview && preview(formData)}
 
         <div className="space-y-6">
           {fieldGroups.map((group, groupIndex) => (
@@ -154,9 +133,9 @@ export default function AddSupplierDialog({ isOpen, onClose, onAddSupplier, fiel
           <Button type="button" variant="outline" onClick={onClose} className="text-white border-slate-600 hover:bg-slate-700">
             Cancel
           </Button>
-          <Button type="button" onClick={handleAddSupplier} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button type="button" onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700 text-white">
              <PlusCircle className="mr-2 h-4 w-4" />
-            Add Supplier
+            Add
           </Button>
         </DialogFooter>
       </DialogContent>
