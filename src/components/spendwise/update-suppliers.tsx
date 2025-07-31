@@ -2,7 +2,7 @@ import type { Supplier } from '@/types/spendwise';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Fingerprint, Building, FileText, Globe2, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database } from "lucide-react";
+import { Fingerprint, Building, FileText, Globe2, PlusCircle, Info, Trash2, MapPin, Loader2, FileSpreadsheet, Database, Edit } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import SupplierWorldMap from './supplier-world-map';
@@ -12,16 +12,17 @@ import React, { useState, useRef } from 'react';
 import { parseSuppliersExcel } from './excel-parser';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import DataEntryDialog, { FieldGroup } from './data-entry-dialog';
+import { v4 as uuidv4 } from 'uuid';
 
 interface UpdateSuppliersTabProps {
   suppliers: Supplier[];
   setSuppliers: React.Dispatch<React.SetStateAction<Supplier[]>>;
 }
 
-const addSupplierFieldGroups: FieldGroup[] = [
+const supplierFieldGroups: FieldGroup[] = [
     [
         { id: 'supplierId', label: 'Supplier ID', type: 'text', placeholder: 'e.g., 989000', required: true },
-        { id: 'name', label: 'Name', type: 'text', placeholder: 'e.g., ABC Manufacturing', required: true },
+        { id: 'name', label: 'Supplier Name', type: 'text', placeholder: 'e.g., ABC Manufacturing', required: true },
     ],
     [
         { id: 'description', label: 'Description', type: 'textarea', placeholder: 'Brief description of the supplier' },
@@ -63,21 +64,48 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
   const [geocodingSupplierId, setGeocodingSupplierId] = useState<string | null>(null);
   const [isUploadingExcel, setIsUploadingExcel] = useState(false);
   const [isDataEntryDialogOpen, setIsDataEntryDialogOpen] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDeleteSupplier = (supplierId: string) => {
     setSuppliers(prevSuppliers => prevSuppliers.filter(s => s.id !== supplierId));
   };
+  
+  const handleOpenEditDialog = (supplier: Supplier) => {
+    setEditingSupplier(supplier);
+    setIsDataEntryDialogOpen(true);
+  };
 
   const handleAddNewSupplier = (newSupplierData: Omit<Supplier, 'id' | 'address' | 'latitude' | 'longitude'>) => {
     const newSupplier: Supplier = {
       ...newSupplierData,
-      id: '', // This will be replaced by uuid in DataEntryDialog, but required by type
+      id: uuidv4(),
       address: [newSupplierData.city, newSupplierData.country].filter(Boolean).join(', '),
       latitude: null,
       longitude: null,
     };
     setSuppliers(prev => [newSupplier, ...prev]);
+  };
+  
+  const handleUpdateSupplier = (updatedSupplierData: Supplier) => {
+    setSuppliers(prev => prev.map(s => s.id === updatedSupplierData.id ? {
+      ...updatedSupplierData,
+      address: [updatedSupplierData.city, updatedSupplierData.country].filter(Boolean).join(', ')
+    } : s));
+    setEditingSupplier(null);
+  };
+
+  const handleDialogSubmit = (data: any) => {
+    if (editingSupplier) {
+      handleUpdateSupplier(data);
+    } else {
+      handleAddNewSupplier(data);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDataEntryDialogOpen(false);
+    setEditingSupplier(null);
   };
 
   const handleGeocodeSupplier = async (supplierToGeocode: Supplier) => {
@@ -153,7 +181,8 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
     try {
       const result = await parseSuppliersExcel(file, suppliers);
       if (result.data.length > 0) {
-        setSuppliers(prev => [...prev, ...result.data]);
+        const newSuppliersWithIds = result.data.map(s => ({ ...s, id: uuidv4() }));
+        setSuppliers(prev => [...prev, ...newSuppliersWithIds]);
         toast({
           title: "Suppliers Imported",
           description: `Successfully imported ${result.data.length} suppliers from Excel.`
@@ -251,7 +280,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
                       <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><FileText className="inline-block mr-1 h-3.5 w-3.5" />Description</TableHead>
                       <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">City</TableHead>
                       <TableHead className="min-w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase"><Globe2 className="inline-block mr-1 h-3.5 w-3.5" />Country</TableHead>
-                      <TableHead className="text-center w-[90px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Actions</TableHead>
+                      <TableHead className="text-center w-[120px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -264,6 +293,14 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
                         <TableCell className="py-1.5">{supplier.country}</TableCell>
                         <TableCell className="py-1.5">
                           <div className="flex items-center justify-center space-x-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10" aria-label="Edit Supplier" onClick={() => handleOpenEditDialog(supplier)}>
+                                    <Edit className="h-3.5 w-3.5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top"><p>Edit Supplier</p></TooltipContent>
+                            </Tooltip>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -308,12 +345,13 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
         </div>
         <DataEntryDialog
           isOpen={isDataEntryDialogOpen}
-          onClose={() => setIsDataEntryDialogOpen(false)}
-          onSubmit={handleAddNewSupplier}
-          fieldGroups={addSupplierFieldGroups}
-          title="Add New Supplier"
-          description="Enter the details for the new supplier."
+          onClose={handleDialogClose}
+          onSubmit={handleDialogSubmit}
+          fieldGroups={supplierFieldGroups}
+          title={editingSupplier ? "Edit Supplier" : "Add New Supplier"}
+          description={editingSupplier ? "Update the details for this supplier." : "Enter the details for the new supplier."}
           preview={SupplierPreview}
+          initialData={editingSupplier}
         />
       </CardContent>
     </Card>

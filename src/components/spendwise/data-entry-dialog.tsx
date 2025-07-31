@@ -10,8 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlusCircle } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
+import { PlusCircle, Save } from 'lucide-react';
 
 export interface FormField {
   id: string;
@@ -31,6 +30,7 @@ interface DataEntryDialogProps {
   title: string;
   description: string;
   preview?: (data: any) => React.ReactNode;
+  initialData?: any;
 }
 
 export default function DataEntryDialog({ 
@@ -40,21 +40,28 @@ export default function DataEntryDialog({
   fieldGroups,
   title,
   description,
-  preview
+  preview,
+  initialData
 }: DataEntryDialogProps) {
   const [formData, setFormData] = useState<any>({});
 
+  const isEditing = !!initialData;
+
   useEffect(() => {
     if (isOpen) {
-      const initialFormData = fieldGroups
-        .flat()
-        .reduce((acc, field) => {
-          acc[field.id] = '';
-          return acc;
-        }, {} as any);
-      setFormData(initialFormData);
+      if (initialData) {
+        setFormData(initialData);
+      } else {
+        const emptyFormData = fieldGroups
+          .flat()
+          .reduce((acc, field) => {
+            acc[field.id] = '';
+            return acc;
+          }, {} as any);
+        setFormData(emptyFormData);
+      }
     }
-  }, [isOpen, fieldGroups]);
+  }, [isOpen, initialData, fieldGroups]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -62,8 +69,7 @@ export default function DataEntryDialog({
   };
 
   const handleSubmit = () => {
-    const dataWithId = { id: uuidv4(), ...formData };
-    onSubmit(dataWithId);
+    onSubmit(formData);
     onClose();
   };
 
@@ -108,7 +114,7 @@ export default function DataEntryDialog({
         <DialogHeader>
           <div className="flex items-center space-x-4">
             <div className="bg-blue-500 rounded-lg p-3">
-              <PlusCircle className="h-6 w-6 text-white" />
+              {isEditing ? <Save className="h-6 w-6 text-white" /> : <PlusCircle className="h-6 w-6 text-white" />}
             </div>
             <div>
               <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
@@ -134,8 +140,8 @@ export default function DataEntryDialog({
             Cancel
           </Button>
           <Button type="button" onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700 text-white">
-             <PlusCircle className="mr-2 h-4 w-4" />
-            Add
+             {isEditing ? <Save className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+             {isEditing ? 'Save Changes' : 'Add Supplier'}
           </Button>
         </DialogFooter>
       </DialogContent>
