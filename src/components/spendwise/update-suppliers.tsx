@@ -222,7 +222,7 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers, onAddSuppl
               <ScrollArea className="h-[calc(100vh-300px)] overflow-auto rounded-md border">
                 <Table className="relative">
                   <TableHeader className="sticky top-0 z-10">
-                    <TableRow className="bg-slate-900">
+                    <TableRow className="bg-slate-900 hover:bg-slate-900">
                       <TableHead className="w-[80px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">ID</TableHead>
                       <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Name</TableHead>
                       <TableHead className="min-w-[130px] px-4 py-3 font-semibold text-xs text-slate-200 tracking-wide uppercase">Description</TableHead>
