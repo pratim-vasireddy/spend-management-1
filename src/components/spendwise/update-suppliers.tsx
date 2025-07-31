@@ -101,11 +101,16 @@ export default function UpdateSuppliersTab({ suppliers, setSuppliers }: UpdateSu
     } else {
       handleAddNewSupplier(data);
     }
+    setIsDataEntryDialogOpen(false);
   };
 
   const handleDialogClose = () => {
     setIsDataEntryDialogOpen(false);
-    setEditingSupplier(null);
+    if (editingSupplier) {
+      setTimeout(() => {
+        setEditingSupplier(null);
+      }, 150);
+    }
   };
 
   const handleGeocodeSupplier = async (supplierToGeocode: Supplier) => {
